@@ -5,13 +5,14 @@
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
+    "khroma": "2.1.0",
+    "prettier": "3.2.5",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "^5.0.0",
-    "prettier": "3.2.5",
-    "khroma": "2.1.0",
-    "tweakpane": "4.0.3",
-    "sonner": "1.4.41"
+    "sass": "^1.76.0",
+    "sonner": "1.4.41",
+    "tweakpane": "4.0.3"
   },
   "devDependencies": {
     "@types/react": "18.2.38",

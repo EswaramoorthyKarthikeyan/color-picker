@@ -6,15 +6,16 @@ import "./style.scss";
 import { useEffect } from "react";
 
 export default function App() {
-    const CONFIG = {
-        rows: 10,
-        cols: 10,
-        showColor: true,
-        colorType: "HEX",
-    };
-
     useEffect(() => {
         const wrapperCls = document.querySelector(".wrapper");
+
+        const CONFIG = {
+            rows: 10,
+            cols: 10,
+            showColor: true,
+            colorType: "HEX",
+        };
+
         const loadTiles = (noOfRows, noOfCols) => {
             console.log(wrapperCls);
             wrapperCls.style.setProperty("--no-of-rows", noOfRows);
@@ -71,6 +72,7 @@ export default function App() {
         };
 
         const CTRL = new Pane({ title: "Config", expanded: true });
+
         CTRL.addBinding(CONFIG, "rows", {
             label: "Rows",
             min: 1,
@@ -102,6 +104,7 @@ export default function App() {
         });
 
         CTRL.on("change", UPDATE);
+
         loadTiles(12, 10);
     }, []);
 
