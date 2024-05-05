@@ -57,18 +57,15 @@ export default function App() {
                     childNode.style.setProperty("--grid-row-end", i + 1);
                     childNode.style.setProperty("--grid-col-start", j);
                     childNode.style.setProperty("--grid-col-end", j + 1);
-                    childNode.addEventListener("click", () => {
-                        navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
-                            if (result.state === "granted") {
-                                navigator.clipboard.writeText(bgColor);
-                                toast.success(` Selected color is ${bgColor}`);
-                            } else if (result.state === "prompt") {
-                                showButtonToEnableMap();
-                            }
-                            // Don't do anything if the permission was denied.
-                            toast.error(`Please Enable the clipboard permission`);
-                        });
-                    });
+                    childNode.addEventListener("click", () => writeClipboardText(bgColor));
+                    async function writeClipboardText(bgColor) {
+                        try {
+                            await navigator.clipboard.writeText(bgColor);
+                            toast.success(` Selected color is ${bgColor}`);
+                        } catch (error) {
+                            toast.error(error.message);
+                        }
+                    }
                 }
             }
         };
