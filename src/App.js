@@ -8,7 +8,6 @@ import { useEffect } from "react";
 export default function App() {
     useEffect(() => {
         const wrapperCls = document.querySelector(".wrapper");
-
         const CONFIG = {
             rows: 10,
             cols: 10,
@@ -17,7 +16,6 @@ export default function App() {
         };
 
         const loadTiles = (noOfRows, noOfCols) => {
-            console.log(wrapperCls);
             wrapperCls.style.setProperty("--no-of-rows", noOfRows);
             wrapperCls.style.setProperty("--no-of-cols", noOfCols);
 
@@ -60,7 +58,7 @@ export default function App() {
                     childNode.style.setProperty("--grid-col-start", j);
                     childNode.style.setProperty("--grid-col-end", j + 1);
                     childNode.addEventListener("click", () => {
-                        navigator.permissions.query({ name: "writeText" }).then((result) => {
+                        navigator.permissions.query({ name: "clipboard-write" }).then((result) => {
                             if (result.state === "granted") {
                                 navigator.clipboard.writeText(bgColor);
                                 toast.success(` Selected color is ${bgColor}`);
@@ -68,7 +66,7 @@ export default function App() {
                                 showButtonToEnableMap();
                             }
                             // Don't do anything if the permission was denied.
-                            toast.error(` Selected color is ${bgColor}`);
+                            toast.error(`Please Enable the clipboard permission`);
                         });
                     });
                 }
