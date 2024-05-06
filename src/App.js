@@ -133,8 +133,7 @@ export default function App() {
                 expand={true}
                 richColors
                 toastOptions={{ style: { backgroundColor: bg, color: color, border: "none" } }}
-            />
-            {bg}
+            /> 
             <div className="container">
                 <div className="wrapper" ref={containerRef}></div>
             </div>
