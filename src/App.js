@@ -34,7 +34,6 @@ export default function App() {
                 const light = i * Math.floor(99 / noOfRows);
 
                 let bgColor = `hsl(${hue} ${sat}% ${light}%)`;
-                console.log(bgColor);
 
                 const ColorTypes = {
                     HSLA: toHsla(bgColor),
@@ -135,7 +134,6 @@ export default function App() {
                 richColors
                 toastOptions={{ style: { backgroundColor: bg, color: color, border: "none" } }}
             />
-            {bg}
             <div className="container">
                 <div className="wrapper" ref={containerRef}></div>
             </div>
