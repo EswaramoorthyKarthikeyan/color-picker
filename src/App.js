@@ -1,13 +1,14 @@
+import { useEffect, useState, useRef } from "react";
 import { Pane } from "tweakpane";
 import { isDark, toHex, toRgba, toHsla } from "khroma";
 import { Toaster, toast } from "sonner";
 
 import "./style.scss";
-import { useEffect, useState, useRef } from "react";
 
 export default function App() {
     const containerRef = useRef(null);
-    const [bg, setBg] = useState("#fff");
+    const [bg, setBg] = useState("");
+    const [color, setColor] = useState("");
 
     const [rowVal, setRowVal] = useState(8);
     const [colVal, setColVal] = useState(8);
@@ -33,6 +34,7 @@ export default function App() {
                 const light = i * Math.floor(99 / noOfRows);
 
                 let bgColor = `hsl(${hue} ${sat}% ${light}%)`;
+                setBg(bgColor);
 
                 const ColorTypes = {
                     HSLA: toHsla(bgColor),
@@ -45,9 +47,11 @@ export default function App() {
                 childNode.style.backgroundColor = bgColor;
 
                 const isDarkBG = isDark(bgColor);
-                const textColor = isDarkBG ? "#fff" : "#000";
-                childNode.style.color = textColor;
+
                 if (showColor) {
+                    const textColor = isDarkBG ? "#fff" : "#000";
+                    childNode.style.color = textColor;
+                    setColor(textColor);
                     childNode.innerText = bgColor;
                 }
                 childNode.style.setProperty("--grid-row-start", i);
@@ -58,7 +62,6 @@ export default function App() {
                 async function writeClipboardText(bgColor) {
                     try {
                         await navigator.clipboard.writeText(bgColor);
-                        setBg(bgColor);
                         toast.success(` Selected color is ${bgColor}`);
                     } catch (error) {
                         toast.error(error.message);
@@ -124,7 +127,12 @@ export default function App() {
 
     return (
         <div className="App">
-            <Toaster position="top-right" expand={true} richColors toastOptions={{ style: { background: bg } }} />
+            <Toaster
+                position="top-right"
+                expand={true}
+                richColors
+                toastOptions={{ style: { backgroundColor: bg, color: color } }}
+            />
             <div className="container">
                 <div className="wrapper" ref={containerRef}></div>
             </div>
