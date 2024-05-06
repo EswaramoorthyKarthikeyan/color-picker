@@ -34,7 +34,6 @@ export default function App() {
                 const light = i * Math.floor(99 / noOfRows);
 
                 let bgColor = `hsl(${hue} ${sat}% ${light}%)`;
-                setBg(bgColor);
 
                 const ColorTypes = {
                     HSLA: toHsla(bgColor),
@@ -46,20 +45,22 @@ export default function App() {
 
                 childNode.style.backgroundColor = bgColor;
 
-                const isDarkBG = isDark(bgColor);
+                const textColor = isDark(bgColor) ? "#fff" : "#000";
 
                 if (showColor) {
-                    const textColor = isDarkBG ? "#fff" : "#000";
                     childNode.style.color = textColor;
-                    setColor(textColor);
                     childNode.innerText = bgColor;
                 }
                 childNode.style.setProperty("--grid-row-start", i);
                 childNode.style.setProperty("--grid-row-end", i + 1);
                 childNode.style.setProperty("--grid-col-start", j);
                 childNode.style.setProperty("--grid-col-end", j + 1);
-                childNode.addEventListener("click", () => writeClipboardText(bgColor));
-                async function writeClipboardText(bgColor) {
+
+                childNode.addEventListener("click", () => writeClipboardText(bgColor, textColor));
+
+                async function writeClipboardText(bgColor, textColor) {
+                    setBg(bgColor);
+                    setColor(textColor);
                     try {
                         await navigator.clipboard.writeText(bgColor);
                         toast.success(` Selected color is ${bgColor}`);
@@ -131,8 +132,9 @@ export default function App() {
                 position="top-right"
                 expand={true}
                 richColors
-                toastOptions={{ style: { backgroundColor: bg, color: color } }}
+                toastOptions={{ style: { backgroundColor: bg, color: color, border: "none" } }}
             />
+            {bg}
             <div className="container">
                 <div className="wrapper" ref={containerRef}></div>
             </div>
