@@ -3,78 +3,87 @@ import { isDark, toHex, toRgba, toHsla } from "khroma";
 import { Toaster, toast } from "sonner";
 
 import "./style.scss";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function App() {
+    const containerRef = useRef(null);
+    const [bg, setBg] = useState("#fff");
+
+    const [rowVal, setRowVal] = useState(8);
+    const [colVal, setColVal] = useState(8);
+    const [showColor, setShowColor] = useState(true);
+    const [colorType, setColorType] = useState("HEX");
+
+    const loadTiles = (noOfRows, noOfCols) => {
+        const wrapperCls = containerRef.current;
+        wrapperCls.style.setProperty("--no-of-rows", noOfRows);
+        wrapperCls.style.setProperty("--no-of-cols", noOfCols);
+
+        wrapperCls.innerHTML = null;
+
+        for (let i = 1; i <= noOfRows; i++) {
+            for (let j = 1; j <= noOfCols; j++) {
+                const childNode = document.createElement("div");
+                childNode.className = "childNode";
+                childNode.id = "childNode" + i + j;
+
+                wrapperCls.appendChild(childNode);
+                const hue = j * Math.floor(360 / noOfCols);
+                const sat = i * Math.floor(99 / noOfRows);
+                const light = i * Math.floor(99 / noOfRows);
+
+                let bgColor = `hsl(${hue} ${sat}% ${light}%)`;
+
+                const ColorTypes = {
+                    HSLA: toHsla(bgColor),
+                    RGBA: toRgba(bgColor),
+                    HEX: toHex(bgColor),
+                };
+
+                bgColor = ColorTypes[colorType];
+
+                childNode.style.backgroundColor = bgColor;
+
+                const isDarkBG = isDark(bgColor);
+                const textColor = isDarkBG ? "#fff" : "#000";
+                childNode.style.color = textColor;
+                if (showColor) {
+                    childNode.innerText = bgColor;
+                }
+                childNode.style.setProperty("--grid-row-start", i);
+                childNode.style.setProperty("--grid-row-end", i + 1);
+                childNode.style.setProperty("--grid-col-start", j);
+                childNode.style.setProperty("--grid-col-end", j + 1);
+                childNode.addEventListener("click", () => writeClipboardText(bgColor));
+                async function writeClipboardText(bgColor) {
+                    try {
+                        await navigator.clipboard.writeText(bgColor);
+                        setBg(bgColor);
+                        toast.success(` Selected color is ${bgColor}`);
+                    } catch (error) {
+                        toast.error(error.message);
+                    }
+                }
+            }
+        }
+    };
+
     useEffect(() => {
-        const wrapperCls = document.querySelector(".wrapper");
+        const CTRL = new Pane({ title: "Config", expanded: true });
+
         const CONFIG = {
-            rows: 10,
-            cols: 10,
+            rows: rowVal,
+            cols: colVal,
             showColor: true,
             colorType: "HEX",
         };
 
-        const loadTiles = (noOfRows, noOfCols) => {
-            wrapperCls.style.setProperty("--no-of-rows", noOfRows);
-            wrapperCls.style.setProperty("--no-of-cols", noOfCols);
-
-            // Removing old child
-            while (wrapperCls.hasChildNodes()) {
-                wrapperCls.removeChild(wrapperCls.lastChild);
-            }
-
-            for (let i = 1; i <= noOfRows; i++) {
-                for (let j = 1; j <= noOfCols; j++) {
-                    const childNode = document.createElement("div");
-                    childNode.className = "childNode";
-                    childNode.id = "childNode" + i + j;
-
-                    wrapperCls.appendChild(childNode);
-                    const hue = j * Math.floor(360 / noOfCols);
-                    const sat = i * Math.floor(99 / noOfRows);
-                    const light = i * Math.floor(99 / noOfRows);
-
-                    let bgColor = `hsl(${hue} ${sat}% ${light}%)`;
-
-                    const ColorTypes = {
-                        HSLA: toHsla(bgColor),
-                        RGBA: toRgba(bgColor),
-                        HEX: toHex(bgColor),
-                    };
-
-                    bgColor = ColorTypes[CONFIG.colorType];
-
-                    childNode.style.backgroundColor = bgColor;
-
-                    const isDarkBG = isDark(bgColor);
-                    const textColor = isDarkBG ? "#fff" : "#000";
-                    childNode.style.color = textColor;
-                    if (CONFIG.showColor) {
-                        childNode.innerText = bgColor;
-                    }
-                    childNode.style.setProperty("--grid-row-start", i);
-                    childNode.style.setProperty("--grid-row-end", i + 1);
-                    childNode.style.setProperty("--grid-col-start", j);
-                    childNode.style.setProperty("--grid-col-end", j + 1);
-                    childNode.addEventListener("click", () => writeClipboardText(bgColor));
-                    async function writeClipboardText(bgColor) {
-                        try {
-                            await navigator.clipboard.writeText(bgColor);
-                            toast.success(` Selected color is ${bgColor}`);
-                        } catch (error) {
-                            toast.error(error.message);
-                        }
-                    }
-                }
-            }
-        };
-
         const UPDATE = () => {
-            loadTiles(CONFIG.rows, CONFIG.cols);
+            setRowVal(CONFIG.rows);
+            setColVal(CONFIG.cols);
+            setShowColor(CONFIG.showColor);
+            setColorType(CONFIG.colorType);
         };
-
-        const CTRL = new Pane({ title: "Config", expanded: true });
 
         CTRL.addBinding(CONFIG, "rows", {
             label: "Rows",
@@ -107,15 +116,17 @@ export default function App() {
         });
 
         CTRL.on("change", UPDATE);
-
-        loadTiles(12, 10);
     }, []);
+
+    useEffect(() => {
+        loadTiles(rowVal, colVal);
+    }, [colorType, showColor, rowVal, colVal]);
 
     return (
         <div className="App">
-            <Toaster position="top-right" expand={true} richColors />
+            <Toaster position="top-right" expand={true} richColors toastOptions={{ style: { background: bg } }} />
             <div className="container">
-                <div className="wrapper"></div>
+                <div className="wrapper" ref={containerRef}></div>
             </div>
         </div>
     );
