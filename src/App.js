@@ -129,7 +129,7 @@ export default function App() {
     return (
         <div className="App">
             <Toaster
-                position="top-right"
+                position="bottom-right"
                 expand={true}
                 richColors
                 toastOptions={{ style: { backgroundColor: bg, color: color, border: "none" } }}
